@@ -20,7 +20,7 @@ We will run write432:
   
 
 ![](https://lh5.googleusercontent.com/WyZAy_d2knpwxY4y_B_RXB3d3xZ3-22cqjYEIkwmE71Z4xKE1No87l6mYVtg7BSYN1-O8GHH1vVo5xZ0reT0U0cX3NdgOUdDmy4pYd3K9rourxTZitCbjJoG8ux0vIbLeFHrYRZG)  
-The program requests some input from the user, and exits immediately afterwards.
+The program requests some input from the user, and exits immediately afterward.
 
   
   
@@ -29,7 +29,7 @@ We will go into more detail about the functionality of the files, and find out h
 
   
 
-we will use Radare see which functions exists
+we will use Radare to see which functions exist
 
   
 
@@ -70,7 +70,7 @@ In order to trigger the buffer overflow, I created a 100 byte string, which we w
 
 
 ![](https://lh5.googleusercontent.com/0RrjCR4ijMDGRsWTTJxe2wL-53O1dFU80KejYrk26o-HwKBJBaeJhcT0YX-XYw2rmweYOehZRPU5nrFXPXs16eUQ21AKy1BQYV72B641R-hc6_VhVzI9u84_TKrYwuDXSHhN5ehW)  
-As we expected the program crashed, and it can be seen that the value that appears in the `EIP` is `0x6161616c` ('laaa') which means that for our payload, we will need a padding of about 44 bytes.
+As we expected the program crashed, and it can be seen that the value that appears in the `EIP` is `0x6161616c` ('laaa') which means that for our payload, we will need padding of about 44 bytes.
 
 ![](https://docs.google.com/drawings/u/0/d/sLbftQy43nY9v8WX1RPSyMQ/image?w=561&h=69&rev=11&ac=1&parent=1w1tKXv6q-WxivHxSLVGf6zbY3pOX8Rl4OrYVNiP8MRw)
 
@@ -85,7 +85,7 @@ We will check if we're right and attempt to override the `EIP` to get the progra
 ![](https://lh4.googleusercontent.com/5lkf64PF38ZaTcZ-XUyOc90ap30ThKxGgJiurAWIg_A7Es5FHTDROPmxNUjfJNx5onit81S-h9hT61-p7FwM9JfpujJ1VjynjteC8GfURocN4h67LpMW-kYrXQPriAClj5EzRD7x)
 
 Ah! We were able to run the function we wanted! Now let's see what the stack looks like:  
-I will put a breakpoint in `print_file()` function (`0x8048538`) -
+I will set a breakpoint in `print_file()` function (`0x8048538`) -
 
 ![](https://lh6.googleusercontent.com/2-Nce5ub0KWkEXg-g9RvuudWApY5iG78H2RZoc7Ev7ySLqPixCMSWmP1aQOHIEOVNsM4h6qvoImwiA5hs04LKktTQ-8fQxRcUkBnIwPCymM6jLEYTZdfBbze6Lw_PYSWmgKjRkOt)
 
@@ -114,7 +114,9 @@ These are the steps we want to perform:
 
  
 
-I will check the sections and their permissions in order to look for places where you may write.
+<![endif]-->
+
+I will observe the sections and their permissions in order to look for writeable places.
 
 ![](https://lh4.googleusercontent.com/A0iLlFMOVRjB_1MPftWiALhh_Su-Waj3GIc-kX-nd4knytcKPUvKAuKvhB7uOTBl4dRFkvw9svkFDynROck22LTxUsDhk9gJSbR9zVfkWcuVxmmSq_yIOTpzYd88wq13yB7ANgoe)
 
@@ -128,9 +130,9 @@ The base address of this section is `0x0804a018`.
 
   
 
-Next, we will search for a gadget that serves our purpose.
+Next, we will search for a gadget that serves our goal.
 
-During the work I noticed an interesting symbol:
+During my work I noticed an interesting symbol:
 
 ![](https://lh5.googleusercontent.com/9nguniyiX5i_YwvsuV8b3KPXdWNt-NGmGRDqUSGTLS3l8rywfAIn2ZgKesdOakT2nqsqswOwfTvcoh5hUMVcnY-3fNDzDsBBT8UXdCwO_OXYqGSTIjBlMvrcSAG-HV8jH09xATF1)
 
@@ -140,7 +142,7 @@ If we disassemble `usefulGadgets`:
 
 Interesting, we got a gadget that places the value of ebp inside the address of edi! Great! We can now write things to addresses in memory!
 
-Now, the next thing we need to do (in order to use this gadget) is find another gadget that will allow us to transfer our data (`"flag.txt"`) and the address to which we want to register (`0x0804a018`) from the stack to the `ebp` and `edi` registers respectively.  
+Now, the next thing we need to do (in order to use this gadget) is to find another gadget that will allow us to transfer our data (`"flag.txt"`) and the address to which we want to register (`0x0804a018`) from the stack to the `ebp` and `edi` registers respectively.  
   
 How do we transfer information from the stack to the registers? Using `pop` instructions.
 
@@ -232,7 +234,9 @@ As you can see, at the end of the first gadget, `ebp = "flag"` and `edi = 0x804a
   
 
 Next up is the second gadget: writing to a memory address.
-![](https://lh4.googleusercontent.com/GdwExIvqUl_gWxfihqIv7mOzirRS54dJZxThWUikclKlplWav6vQ-IqdDjV6S0h5o7zCr0wDB_Ep6otj-Ux8J_PDhK9nZP8ZD3Tt-O2loEWYnxdPjcynssIIVthcSYz8G_eAAQ5I)After running the second gadget, now the address in `edi` contains the value we wanted (`"flag"`).
+![](https://lh4.googleusercontent.com/GdwExIvqUl_gWxfihqIv7mOzirRS54dJZxThWUikclKlplWav6vQ-IqdDjV6S0h5o7zCr0wDB_Ep6otj-Ux8J_PDhK9nZP8ZD3Tt-O2loEWYnxdPjcynssIIVthcSYz8G_eAAQ5I)
+
+After running the second gadget, now the address in `edi` contains the value we wanted (`"flag"`).
 
   
 
@@ -245,7 +249,9 @@ We will continue the program until we reach the `print_file()` function:
   
 
   
-![](https://lh4.googleusercontent.com/z8VlOEi8N8W48lV13hPDV5nfoO7ViklsUyJ-eYzKNMLXF5nLbqTpGQX83pYmDo_YnW6uHO1araqhBPY-RUHOiQ8ZpgmsF1ToyebROGHW-lukOu13kuJpQv_Ks4L4o-1CAePvZFXw)Excellent, `print_file()` will run now, receiving as a parameter the full name of our file -”flag.txt”
+![](https://lh4.googleusercontent.com/z8VlOEi8N8W48lV13hPDV5nfoO7ViklsUyJ-eYzKNMLXF5nLbqTpGQX83pYmDo_YnW6uHO1araqhBPY-RUHOiQ8ZpgmsF1ToyebROGHW-lukOu13kuJpQv_Ks4L4o-1CAePvZFXw)
+
+Excellent, `print_file()` will run now, receiving as a parameter the full name of our file -”flag.txt”
 
 We will keep running and get our flag:
 
